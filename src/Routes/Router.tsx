@@ -1,27 +1,22 @@
-import { createBrowserRouter } from "react-router-dom";
-import Root from "./Root";
-import NotFound from "../Screen/NotFound";
-import Login from "../Screen/Login";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "../Screen/Home";
+import Login from "../Screen/Login/Login";
+import SignUp from "../Screen/Login/sign-up";
+import NotFound from "../Screen/NotFound";
+import { useRecoilValue } from "recoil";
+import { loggedinState } from "../atom";
 
-const rootRouter = createBrowserRouter([
-  {
-    path: "/",
-    element: <Root />,
-    children: [],
-  },
-  {
-    path: "/Login",
-    element: <Login />,
-  },
-  {
-    path: "/Home",
-    element: <Home />,
-  },
-  {
-    path: "*",
-    element: <NotFound />,
-  },
-]);
+function Router() {
+  const isLoggedIn = useRecoilValue(loggedinState);
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={isLoggedIn ? <Home /> : <Login />} />
+        <Route path="/sign-up" element={!isLoggedIn ? <SignUp /> : null} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
-export default rootRouter;
+export default Router;
