@@ -2,8 +2,7 @@ import { faBlackTie } from "@fortawesome/free-brands-svg-icons";
 import { styled } from "styled-components";
 
 export const SAuthButton = styled.button`
-  margin-top: 8px;
-  margin-bottom: 25px;
+  margin: 8px 0px;
   border: none;
   width: 250px;
   height: 33px;

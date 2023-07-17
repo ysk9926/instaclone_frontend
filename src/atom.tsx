@@ -1,8 +1,10 @@
 import { atom } from "recoil";
 
+const TOKEN = "token";
+
 export const loggedinState = atom({
   key: "login",
-  default: false,
+  default: Boolean(localStorage.getItem(TOKEN)),
 });
 
 export const isDarkState = atom({

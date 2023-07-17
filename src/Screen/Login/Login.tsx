@@ -11,6 +11,10 @@ import { styled } from "styled-components";
 import PageTitle from "../../Components/PageTitle";
 import { useForm, SubmitHandler } from "react-hook-form";
 import FormError from "../../Components/Auth/FormError";
+import { gql, useMutation } from "@apollo/client";
+import { useSetRecoilState } from "recoil";
+import { loggedinState } from "../../atom";
+import { useLocation } from "react-router-dom";
 
 const FacebookLogin = styled.div`
   margin-top: 40px;
@@ -22,20 +26,82 @@ const FacebookLogin = styled.div`
   margin-bottom: 40px;
 `;
 
-type FormValue = {
-  username: string;
+const LOGIN_MUTATION = gql`
+  mutation login($userName: String!, $password: String!) {
+    login(userName: $userName, password: $password) {
+      ok
+      token
+      error
+    }
+  }
+`;
+
+interface FormValue {
+  userName: string;
   password: string;
-};
+  result: string;
+}
+
+interface IResult {
+  login: {
+    ok: boolean;
+    error: string;
+    token: string;
+  };
+}
+const TOKEN = "token";
 
 function Login() {
+  const location = useLocation();
+  console.log(location);
+  //변수 선언
+  const setIsLoggedIn = useSetRecoilState(loggedinState);
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<FormValue>({ mode: "onBlur" });
-  const onsubmitValid: SubmitHandler<FormValue> = (data) => {
-    //console.log(data);
+    getValues,
+    setError,
+    clearErrors,
+  } = useForm<FormValue>({
+    mode: "onChange",
+    defaultValues: {
+      userName: location?.state?.userName || "",
+      password: location?.state?.password || "",
+    },
+  });
+  //LOGIN_MUTATION에서 받아온 data 처리
+  const onCompleted = (data: IResult) => {
+    const {
+      login: { ok, error, token },
+    } = data;
+    //ok:false가 나온경우 error메세지를 리턴
+    if (!ok) {
+      return setError("result", {
+        message: error,
+      });
+    }
+    //token이 존재하는 경우 localstorage에 토큰을 저장해 로그인상태 확인
+    if (token) {
+      localStorage.setItem(TOKEN, token);
+      setIsLoggedIn(true);
+    }
   };
+  //LOTIN_MUTATION 변수 선언 및 mutation가져오기
+  const [login, { loading }] = useMutation(LOGIN_MUTATION, { onCompleted });
+  const onsubmitValid: SubmitHandler<FormValue> = (data) => {
+    if (loading) {
+      return;
+    }
+    const { userName, password } = getValues();
+    login({
+      variables: { userName, password },
+    });
+  };
+  const clearLoginErr = () => {
+    clearErrors("result");
+  };
+
   return (
     <AuthLayout>
       <PageTitle title="Login" />
@@ -43,25 +109,29 @@ function Login() {
         <SAuthLogo />
         <form onSubmit={handleSubmit(onsubmitValid)}>
           <AuthInput
-            {...register("username", {
+            {...register("userName", {
               required: "아이디를 입력하세요",
               minLength: { value: 5, message: "5글자 이상 입력해주세요" },
+              onChange() {
+                clearLoginErr();
+              },
             })}
-            placeholder="전화번소, 사용자 이름 또는 이메일"
+            placeholder="사용자 이름"
             type="text"
-            hasErrors={Boolean(errors.username)}
+            hasError={Boolean(errors.userName?.message)}
           />
-          <FormError message={errors.username?.message} />
+          <FormError message={errors.userName?.message} />
           <AuthInput
             {...register("password", { required: "비밀번호를 입력하세요" })}
             placeholder="비밀번호"
             type="password"
-            hasErrors={Boolean(errors.password)}
+            hasError={Boolean(errors.password?.message)}
           />
           <FormError message={errors.password?.message} />
           <SAuthButton type="submit" disabled={!isValid}>
             로그인
           </SAuthButton>
+          <FormError message={errors.result?.message} />
         </form>
         <SSeparator />
         <FacebookLogin>

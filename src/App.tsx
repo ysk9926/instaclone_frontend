@@ -6,7 +6,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { useRecoilState } from "recoil";
 import { isDarkState } from "./atom";
 import { ApolloProvider } from "@apollo/client";
-import { client } from "./client";
+import { client } from "./apollo";
 
 const GolbalStyle = createGlobalStyle`
     *{
@@ -23,6 +23,7 @@ const GolbalStyle = createGlobalStyle`
 
 function App() {
   const isDark = useRecoilState(isDarkState);
+
   return (
     <>
       <ApolloProvider client={client}>

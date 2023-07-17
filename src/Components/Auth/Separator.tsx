@@ -1,6 +1,7 @@
 import { styled } from "styled-components";
 
 const Separator = styled.div`
+  margin-top: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
