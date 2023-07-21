@@ -10,12 +10,16 @@ module.exports = {
         one: "1px",
       },
       maxWidth: {
+        subTitle: "250px",
         baseBox: "350px",
       },
       colors: {
         boxBorder: "#dbdbdb",
         fbBlue: "#0095f6",
         fbBlueHover: "#1a77f2",
+      },
+      outlineWidth: {
+        0.2: "0.2px",
       },
     },
   },
