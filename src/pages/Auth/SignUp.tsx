@@ -7,9 +7,101 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import Seperate from "../../components/Auth/Seperate";
 import BottomBox from "../../components/Auth/BottomBox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
+import ErrorForm from "../../components/Auth/ErrorForm";
+import { gql, useMutation } from "@apollo/client";
+
+const CREATE_ACCOUNT_MUTATION = gql`
+  mutation createAccount(
+    $email: String!
+    $firstName: String!
+    $lastName: String!
+    $userName: String!
+    $password: String!
+  ) {
+    createAccount(
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      userName: $userName
+      password: $password
+    ) {
+      ok
+      error
+    }
+  }
+`;
+interface ICreateAccountData {
+  createAccount: {
+    ok: string;
+    error: string;
+  };
+}
+
+interface ISignupForm {
+  email: string;
+  firstname: string;
+  lastname: string;
+  username: string;
+  password: string;
+  passwordConfirmation: string;
+  result: string;
+}
 
 function SignUp() {
+  const navigate = useNavigate();
+  const onCompleted = (data: ICreateAccountData) => {
+    const {
+      createAccount: { ok, error },
+    } = data;
+    if (!ok) {
+      return setError("result", {
+        message: error,
+      });
+    }
+    const { username, password } = getValues();
+    navigate("/", {
+      state: {
+        message: "가입이 완료됐습니다. 로그인을 해주세요",
+        username,
+        password,
+      },
+    });
+  };
+  const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT_MUTATION, {
+    onCompleted,
+  });
+  const onSubmitValid: SubmitHandler<ISignupForm> = (data) => {
+    if (loading) {
+      return;
+    }
+    const { email, firstname, lastname, username, password } = getValues();
+    createAccount({
+      variables: {
+        email,
+        firstName: firstname,
+        lastName: lastname,
+        userName: username,
+        password,
+      },
+    });
+  };
+  const clearLoginError = () => {
+    clearErrors("result");
+  };
+  const {
+    register,
+    formState: { errors },
+    watch,
+    setError,
+    handleSubmit,
+    getValues,
+    clearErrors,
+  } = useForm<ISignupForm>({
+    mode: "onChange",
+  });
+  const watchPassword = watch("password", "");
   return (
     <AuthLayout>
       {/* FormBox */}
@@ -30,32 +122,75 @@ function SignUp() {
         {/* seperate */}
         <Seperate />
         {/* sign-up Form */}
-        <form className=" flex justify-center items-center flex-col mb-8">
+        <form
+          onSubmit={handleSubmit(onSubmitValid)}
+          className=" flex justify-center items-center flex-col mb-8"
+        >
           <input
+            {...register("email", {
+              required: "이메일 주소를 입력해주세요",
+              pattern: {
+                value: /[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/,
+                message: "이메일 형식을 지켜서 입력해주세요",
+              },
+              onChange() {
+                clearLoginError();
+              },
+            })}
             type="text"
             className=" outline-boxBorder px-2 bg-gray-100 border border-boxBorder rounded mt-3 w-inputSize h-8 placeholder:text-gray-400 placeholder:text-xs"
             placeholder="이메일 주소"
           />
+          <ErrorForm message={errors.email?.message} />
           <input
+            {...register("firstname", {
+              required: "이름의 성을 작성해주세요",
+            })}
             type="text"
             className=" outline-boxBorder px-2 bg-gray-100 border border-boxBorder rounded mt-2 w-inputSize h-8 placeholder:text-gray-400 placeholder:text-xs"
             placeholder="성"
           />
+          <ErrorForm message={errors.firstname?.message} />
           <input
+            {...register("lastname", {
+              required: "이름을 입력해주세요",
+            })}
             type="text"
             className="  outline-boxBorder px-2 bg-gray-100 border border-boxBorder rounded mt-2 w-inputSize h-8 placeholder:text-gray-400 placeholder:text-xs"
             placeholder="이름"
           />
+          <ErrorForm message={errors.lastname?.message} />
           <input
+            {...register("username", {
+              required: "사용자 이름을 입력해주세요",
+              onChange() {
+                clearLoginError();
+              },
+            })}
             type="text"
             className="  outline-boxBorder px-2 bg-gray-100 border border-boxBorder rounded mt-2 w-inputSize h-8 placeholder:text-gray-400 placeholder:text-xs"
             placeholder="사용자 이름"
           />
+          <ErrorForm message={errors.username?.message} />
           <input
+            {...register("password", {
+              required: "비밀번호를 입력해주세요",
+            })}
             type="password"
             className=" outline-boxBorder px-2 bg-gray-100 border border-boxBorder rounded mt-2 w-inputSize h-8 placeholder:text-gray-400 placeholder:text-xs"
             placeholder="비밀번호"
           />
+          <input
+            {...register("passwordConfirmation", {
+              required: "비밀번호를 입력해주세요",
+              validate: (value) =>
+                value === watchPassword || "Passwords do not match",
+            })}
+            type="password"
+            className=" outline-boxBorder px-2 bg-gray-100 border border-boxBorder rounded mt-2 w-inputSize h-8 placeholder:text-gray-400 placeholder:text-xs"
+            placeholder="비밀번호"
+          />
+          <ErrorForm message={errors.passwordConfirmation?.message} />
           {/* Form Footer */}
           <div className="mt-4 max-w-subTitle text-center">
             <span className=" text-xs text-gray-400">
@@ -70,9 +205,13 @@ function SignUp() {
             </Link>
           </div>
 
-          <button className=" mt-2 w-inputSize h-8 bg-fbBlue text-white rounded-md font-semibold text-sm">
+          <button
+            type="submit"
+            className=" mt-2 w-inputSize h-8 bg-fbBlue text-white rounded-md font-semibold text-sm"
+          >
             가입
           </button>
+          <ErrorForm message={errors.result?.message} />
         </form>
       </FormBox>
       {/* BottomBox */}
