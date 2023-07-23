@@ -68,7 +68,7 @@ function Login() {
   };
   const {
     register,
-    formState: { errors },
+    formState: { errors, isValid },
     setError,
     handleSubmit,
     getValues,
@@ -118,7 +118,8 @@ function Login() {
           <ErrorForm message={errors.password?.message} />
           <button
             type="submit"
-            className=" mt-2 w-inputSize h-8 bg-fbBlue text-white rounded-md font-semibold text-sm"
+            className={` mt-2 w-inputSize h-8 bg-fbBlue text-white rounded-md font-semibold text-sm
+            ${isValid ? "" : "pointer-events-none opacity-50"}`}
           >
             로그인
           </button>

@@ -92,7 +92,7 @@ function SignUp() {
   };
   const {
     register,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
     setError,
     handleSubmit,
@@ -206,8 +206,11 @@ function SignUp() {
           </div>
 
           <button
+            disabled={!isValid}
             type="submit"
-            className=" mt-2 w-inputSize h-8 bg-fbBlue text-white rounded-md font-semibold text-sm"
+            className={`mt-2 w-inputSize h-8 bg-fbBlue text-white rounded-md font-semibold text-sm ${
+              isValid ? "" : " pointer-events-none opacity-50"
+            }`}
           >
             가입
           </button>
