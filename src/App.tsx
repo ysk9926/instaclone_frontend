@@ -5,6 +5,7 @@ import NotFound from "./NotFound";
 import { ApolloProvider, useReactiveVar } from "@apollo/client";
 import { client, isLoggedInVar } from "./apollo";
 import Home from "./pages/Home";
+import Layout from "./components/Layout";
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -12,7 +13,18 @@ function App() {
     <ApolloProvider client={client}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={isLoggedIn ? <Home /> : <Login />} />
+          <Route
+            path="/"
+            element={
+              isLoggedIn ? (
+                <Layout>
+                  <Home />
+                </Layout>
+              ) : (
+                <Login />
+              )
+            }
+          />
           <Route path="/sign-up" element={isLoggedIn ? null : <SignUp />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

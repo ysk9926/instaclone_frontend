@@ -13,6 +13,9 @@ module.exports = {
         subTitle: "250px",
         baseBox: "350px",
       },
+      minWidth: {
+        main: "300px",
+      },
       colors: {
         boxBorder: "#dbdbdb",
         fbBlue: "#0095f6",

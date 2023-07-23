@@ -10,7 +10,7 @@ import AuthLayout from "../../components/Auth/AuthLayout";
 import { SubmitHandler, useForm } from "react-hook-form";
 import ErrorForm from "../../components/Auth/ErrorForm";
 import { gql, useMutation } from "@apollo/client";
-import { TOKEN, logUserIn } from "../../apollo";
+import { logUserIn } from "../../apollo";
 import { useLocation } from "react-router-dom";
 
 const LOGIN_MUTATION = gql`
