@@ -1,8 +1,23 @@
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useUser from "../Hooks/useUser";
+import { useEffect, useState } from "react";
 
 function Sidebar() {
+  const data = useUser();
+  const [avatar, setAvatar] = useState("");
+  useEffect(() => {
+    if (data && data.me) {
+      console.log(data.me);
+      console.log(data.me.avatar);
+      setAvatar(data.me.avatar);
+    }
+  }, [data]);
+
+  if (!data) {
+    console.log("데이터가 없음");
+  }
   return (
     // wrapper
     <div className=" flex justify-between flex-col pt-6 pl-5">
@@ -50,7 +65,7 @@ function Sidebar() {
         <span className=" ml-3 text-base font-semibold">메시지</span>
       </div>
       <div className=" flex items-center mt-8">
-        <FontAwesomeIcon icon={faHome} size="2x" className=" w-8" />
+        <img src={avatar} />
         <span className=" ml-3 text-base font-semibold">프로필</span>
       </div>
     </div>
