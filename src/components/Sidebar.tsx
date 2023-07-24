@@ -1,4 +1,5 @@
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
+import { faBars, faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useUser from "../Hooks/useUser";
 import { useEffect, useState } from "react";
