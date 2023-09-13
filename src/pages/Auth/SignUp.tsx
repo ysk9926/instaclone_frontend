@@ -34,7 +34,7 @@ const CREATE_ACCOUNT_MUTATION = gql`
 `;
 interface ICreateAccountData {
   createAccount: {
-    ok: string;
+    ok: boolean;
     error: string;
   };
 }

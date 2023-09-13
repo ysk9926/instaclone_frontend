@@ -5,9 +5,11 @@ module.exports = {
     extend: {
       width: {
         inputSize: "250px",
+        feedImg: "470px",
       },
       height: {
         one: "1px",
+        feedImg: "580px",
       },
       maxWidth: {
         subTitle: "250px",
